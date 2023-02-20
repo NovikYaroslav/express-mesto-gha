@@ -1,12 +1,8 @@
-// const router = require('express').Router();
+const router = require('express').Router();
 
-// const { users } = require('moongose')
+const { getUsers, createUser } = require('../controllers/users');
 
-// router.get('/users', (req, res) => {
-//   if (!users[req.params.id]) {
-//     res.send({error: 'Такого пользователя нет'})
-//   }
-//   res.send(users[req.params.id]);
-// })
+router.get('/', getUsers);
+router.post('/', createUser);
 
-// module.exports = router
+module.exports = router;
