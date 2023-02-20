@@ -1,0 +1,29 @@
+↳ [-] [GET] Получение пользователя с некорректным id
+  GET http://localhost:3000/users/text
+  404 Not Found ★ 5ms time ★ 236B↑ 298B↓ size ★ 7↑ 7↓ headers ★ 0 cookies
+  ┌ ↓ application/json ★ text ★ json ★ utf8 ★ 56B
+  │ {"message":"Пользователь не найден"}
+  └
+  prepare   wait    dns-lookup   tcp-handshake   transfer-start   download   process   total
+  1ms       242µs   (cache)      (cache)         3ms              1ms        62µs      6ms
+
+  ✓  В ответе приходит JSON-объект
+  1. Код ответа равен 400
+  ✓  Проверка возврата поля message
+  ✓  Ответ содержит message длинной больше 1 символа
+
+↳ [-] [GET] Получение пользователя с несуществующим в БД id
+  GET http://localhost:3000/users/61eade4c6d5acf558c42d9b8
+  200 OK ★ 6ms time ★ 256B↑ 247B↓ size ★ 7↑ 7↓ headers ★ 0 cookies
+  ┌ ↓ application/json ★ text ★ json ★ utf8 ★ 13B
+  │ {"data":null}
+  └
+  prepare   wait    dns-lookup   tcp-handshake   transfer-start   download   process   total
+  1ms       250µs   (cache)      (cache)         3ms              1ms        43µs      6ms
+
+  ✓  В ответе приходит JSON-объект
+  2. Код ответа равен 404
+  3. Проверка возврата поля message
+  4. Ответ содержит message длинной больше 1 символа
+
+
