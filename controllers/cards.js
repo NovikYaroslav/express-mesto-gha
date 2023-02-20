@@ -27,7 +27,12 @@ module.exports.createCard = (req, res) => {
 module.exports.deleteCard = (req, res) => {
   card
     .findByIdAndRemove(req.params.cardId)
-    .then((card) => res.send({ data: card }))
+    .then((card) => {
+      if (card === null) {
+       return res.status(404).send({ message: "Карточки нет в базе данных" });
+      }
+      res.send({ data: card });
+    })
     .catch((err) => {
       if (err.name === "CastError") {
         // 404
@@ -45,7 +50,12 @@ module.exports.likeCard = (req, res) => {
       { $addToSet: { likes: req.user._id } },
       { new: true }
     )
-    .then((card) => res.send({ data: card }))
+    .then((card) => {
+      if (card === null) {
+       return res.status(404).send({ message: "Карточки нет в базе данных" });
+      }
+      res.send({ data: card });
+    })
     .catch((err) => {
       if (err.name === "CastError") {
             // 404
@@ -63,7 +73,12 @@ module.exports.dislikeCard = (req, res) => {
       { $pull: { likes: req.user._id } },
       { new: true }
     )
-    .then((card) => res.send({ data: card }))
+    .then((card) => {
+      if (card === null) {
+       return res.status(404).send({ message: "Карточки нет в базе данных" });
+      }
+      res.send({ data: card });
+    })
     .catch((err) => {
       if (err.name === "CastError") {
             // 404

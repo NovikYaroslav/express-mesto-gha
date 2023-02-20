@@ -27,10 +27,15 @@ module.exports.createUser = (req, res) => {
 module.exports.getUser = (req, res) => {
   user
     .findById(req.params.userId)
-    .then((targetUser) => res.send({ data: targetUser }))
+    .then((targetUser) => {
+      if (targetUser === null) {
+       return res.status(404).send({ message: "Пользователь нет в базе данных" });
+      }
+      res.send({ data: targetUser });
+    })
     .catch((err) => {
       if (err.name === "CastError") {
-            // 404
+        // 404
         res.status(400).send({ message: "Пользователь не найден" });
       } else {
         res.status(500).send({ message: "Произошла ошибка" });
@@ -56,6 +61,7 @@ module.exports.updateUser = (req, res) => {
       }
     });
 };
+
 
 module.exports.updateUserAvatar = (req, res) => {
   user
