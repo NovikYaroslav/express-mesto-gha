@@ -22,8 +22,7 @@ app.use((req, res, next) => {
 });
 app.use(express.json());
 app.use('/users', require('./routers/users'));
-app.use('/users/:userId', require('./routers/users'));
 app.use('/cards', require('./routers/cards'));
-// app.use('/cards/:cardId', require('./routers/cards'));
+
 
 
