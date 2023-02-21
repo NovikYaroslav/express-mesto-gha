@@ -1,5 +1,6 @@
 const express = require('express');
 const mongoose = require('mongoose');
+
 const { PORT = 3000 } = process.env;
 const app = express();
 
@@ -16,13 +17,15 @@ mongoose.connect(
 app.listen(PORT);
 app.use((req, res, next) => {
   req.user = {
-    _id: '63f360857f4db8710e269555'
+    _id: '63f360857f4db8710e269555',
   };
   next();
 });
 app.use(express.json());
 app.use('/users', require('./routers/users'));
+
 app.use('/cards', require('./routers/cards'));
+
 app.use((req, res) => {
-  res.status(404).send({ message: "Страница не найдена" });
+  res.status(404).send({ message: 'Страница не найдена' });
 });
