@@ -10,10 +10,11 @@ module.exports.getCards = (req, res) => {
 
 module.exports.createCard = (req, res) => {
   const { name, link } = req.body;
-
   card
-    .create({ name, link })
-    .then((newCard) => res.send({ data: newCard }))
+    .create({ name, link, owner: req.user._id })
+    .then((newCard) => {
+      res.send({ data: newCard });
+    })
     .catch((err) => {
       if (err.name === 'ValidationError') {
         const ERROR_CODE = 400;
@@ -34,8 +35,9 @@ module.exports.deleteCard = (req, res) => {
       if (targetCard === null) {
         const ERROR_CODE = 404;
         res.status(ERROR_CODE).send({ message: 'Карточки нет в базе данных' });
+      } else {
+        res.send({ data: targetCard });
       }
-      res.send({ data: card });
     })
     .catch((err) => {
       if (err.name === 'CastError') {
@@ -58,9 +60,11 @@ module.exports.likeCard = (req, res) => {
     .then((targetCard) => {
       if (targetCard === null) {
         const ERROR_CODE = 404;
-        res.status(ERROR_CODE).send({ message: 'Карточки нет в базе данных' });
+        res
+          .status(ERROR_CODE)
+          .send({ message: 'Карточки нет в базе данных' });
       }
-      res.send({ data: card });
+      res.send({ data: targetCard });
     })
     .catch((err) => {
       if (err.name === 'CastError') {

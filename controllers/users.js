@@ -36,8 +36,7 @@ module.exports.getUser = (req, res) => {
         res
           .status(ERROR_CODE)
           .send({ message: 'Пользователь нет в базе данных' });
-      }
-      res.send({ data: targetUser });
+      } else { res.send({ data: targetUser }); }
     })
     .catch((err) => {
       if (err.name === 'CastError') {

@@ -25,3 +25,12 @@ const userSchema = new Schema(
 );
 
 module.exports = mongoose.model('user', userSchema);
+
+// .then((updatedUser) => {
+//   if (updatedUser === null) {
+//     const ERROR_CODE = 404;
+//     res
+//       .status(ERROR_CODE)
+//       .send({ message: 'Пользователь нет в базе данных' });
+//   } else { res.send({ data: updatedUser }); }
+// })
