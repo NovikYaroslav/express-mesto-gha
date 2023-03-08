@@ -17,9 +17,6 @@
 
     ],
     "rules": {
-      "eslint-disable": "no-unused-vars",
-      "no-underscore-dangle": ["error", { "allow": ["_id"] }],
-      "import/no-extraneous-dependencies": ["error", {"devDependencies": false, "optionalDependencies": false, "peerDependencies": false}],
-      "linebreak-style": 0
+      "no-underscore-dangle": ["error", { "allow": ["_id"] }]
     }
 }

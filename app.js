@@ -1,29 +1,24 @@
-const express = require("express");
-const mongoose = require("mongoose");
-const { PORT } = require("./config");
+const express = require('express');
+const mongoose = require('mongoose');
+const { PORT } = require('./config');
+
 const app = express();
-const { login } = require("./controllers/users");
-const { createUser } = require("./controllers/users");
-const auth = require("./middlewares/auth");
+const { login } = require('./controllers/users');
+const { createUser } = require('./controllers/users');
+const auth = require('./middlewares/auth');
 
-mongoose.set("strictQuery", false);
+mongoose.set('strictQuery', false);
 
-mongoose.connect("mongodb://127.0.0.1/mestodb", {
+mongoose.connect('mongodb://127.0.0.1/mestodb', {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 });
 
 app.listen(PORT);
-app.use((req, res, next) => {
-  req.user = {
-    _id: "63f360857f4db8710e269555",
-  };
-  next();
-});
 
 app.use(express.json());
-app.post("/signin", login);
-app.post("/signup", createUser);
+app.post('/signin', login);
+app.post('/signup', createUser);
 
-app.use("/users", auth, require("./routers/users"));
-app.use("/cards", auth, require("./routers/cards"));
+app.use('/users', auth, require('./routers/users'));
+app.use('/cards', auth, require('./routers/cards'));
