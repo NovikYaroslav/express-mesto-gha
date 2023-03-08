@@ -1,5 +1,7 @@
 const express = require('express');
 const mongoose = require('mongoose');
+const rateLimit = require('express-rate-limit');
+const helmet = require('helmet');
 const { PORT } = require('./config');
 const { login } = require('./controllers/users');
 const { createUser } = require('./controllers/users');
@@ -16,8 +18,9 @@ mongoose.connect('mongodb://127.0.0.1/mestodb', {
 });
 
 app.listen(PORT);
-
 app.use(express.json());
+app.use(helmet);
+app.use(rateLimit);
 app.post('/signin', login);
 app.post('/signup', createUser);
 app.use('/users', auth, require('./routers/users'));
