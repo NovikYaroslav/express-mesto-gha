@@ -1,7 +1,28 @@
 const bcrypt = require('bcrypt');
 const user = require('../models/user');
+const jsonwebtoken = require('jsonwebtoken');
+const { JWT_SECRET } = require('../config');
 
 const { ERROR_CODE_400, ERROR_CODE_404, ERROR_CODE_500 } = require('../utils/errors');
+
+module.exports.login = (req, res) => {
+  const { email, password } = req.body;
+
+  user
+    .findOne({ email: email })
+    .orFail(() => res.status(404).send({ message: 'Пользователь не найден Login' }))
+    .then((user) => bcrypt.compare(password, user.password).then((matched) => {
+      if (matched) {
+        return user;
+      }
+      return res.status(404).send({ message: 'Пользователь не найден Login Hash' });
+    }))
+    .then((user) => {
+      const jwt = jsonwebtoken.sign({ _id: user._id }, JWT_SECRET, { expiresIn: '7d' });
+      res.send({ jwt });
+    })
+    .catch((err) => res.status(404).send({ message: err.message }))
+};
 
 module.exports.getUsers = (req, res) => {
   user
@@ -41,6 +62,21 @@ module.exports.getUser = (req, res) => {
   user
     .findById(req.params.userId)
     .then((targetUser) => res.send({ data: targetUser }))
+    .catch((err) => {
+      if (err.name === "CastError") {
+        res.status(404).send({ message: "Пользователь не найден" });
+      } else {
+        res.status(500).send({ message: "Произошла ошибка" });
+      }
+    });
+};
+
+module.exports.getCurrentUser = (req, res) => {
+  const { payload } = req.body;
+
+  user
+    .findById(payload._id)
+    .then((CurrentUser) => res.send({ data: CurrentUser }))
     .catch((err) => {
       if (err.name === "CastError") {
         res.status(404).send({ message: "Пользователь не найден" });

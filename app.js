@@ -1,7 +1,11 @@
 const express = require('express');
 const mongoose = require('mongoose');
-const { PORT = 3000 } = process.env;
+const { PORT } = require('./config');
 const app = express();
+const {login} = require('./controllers/users');
+const {createUser} = require('./controllers/users');
+const auth = require('./middlewares/auth');
+
 
 
 
@@ -24,9 +28,12 @@ app.use((req, res, next) => {
 });
 
 app.use(express.json());
-app.use('/users', require('./routers/users'));
-app.use('/cards', require('./routers/cards'));
-app.use('/signin', require('./routers/login'));
+app.post('/signin', login);
+app.post('/signup', createUser);
+
+app.use('/users', auth, require('./routers/users'));
+app.use('/cards', auth, require('./routers/cards'));
+
 
 
 
