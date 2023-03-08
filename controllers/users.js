@@ -3,7 +3,12 @@ const jsonwebtoken = require('jsonwebtoken');
 const user = require('../models/user');
 const { JWT_SECRET } = require('../config');
 
-const { ERROR_CODE_400, ERROR_CODE_404, ERROR_CODE_500 } = require('../utils/errors');
+const {
+  ERROR_CODE_400,
+  ERROR_CODE_404,
+  ERROR_CODE_409,
+  ERROR_CODE_500,
+} = require('../utils/errors');
 
 module.exports.login = (req, res) => {
   const { email, password } = req.body;
@@ -11,25 +16,25 @@ module.exports.login = (req, res) => {
   user
     .findOne({ email })
     .select('+password')
-    .orFail(() => res.status(404).send({ message: 'Пользователь не найден Login' }))
+    .orFail(() => res.status(ERROR_CODE_404).send({ message: 'Пользователь не найден Login' }))
     .then((userData) => bcrypt.compare(password, userData.password).then((matched) => {
       if (matched) {
         return user;
       }
-      return res.status(404).send({ message: 'Пользователь не найден Login Hash' });
+      return res.status(ERROR_CODE_404).send({ message: 'Пользователь не найден Login Hash' });
     }))
     .then((loggedUser) => {
       const jwt = jsonwebtoken.sign({ _id: loggedUser._id }, JWT_SECRET, { expiresIn: '7d' });
       res.send({ jwt });
     })
-    .catch((err) => res.status(404).send({ message: err.message }));
+    .catch((err) => res.status(ERROR_CODE_404).send({ message: err.message }));
 };
 
 module.exports.getUsers = (req, res) => {
   user
     .find({})
     .then((users) => res.send({ data: users }))
-    .catch(() => res.status(500).send({ message: 'Произошла ошибка' }));
+    .catch(() => res.status(ERROR_CODE_500).send({ message: 'Произошла ошибка' }));
 };
 
 module.exports.createUser = (req, res) => {
@@ -45,14 +50,14 @@ module.exports.createUser = (req, res) => {
       email,
       password: hash,
     }))
-    .then((newUser) => res.send({ data: newUser }))
+    .then((newUser) => res.send({ data: newUser.email }))
     .catch((err) => {
       if (!password || !email) {
-        res.status(404).send({ message: 'Заполните все обязательные поля' });
+        res.status(ERROR_CODE_400).send({ message: 'Заполните все обязательные поля' });
       }
       if (err.code === 11000) {
         res
-          .status(ERROR_CODE_404)
+          .status(ERROR_CODE_409)
           .send({ message: 'Пользователь с такими данными уже существует' });
       }
       if (err.name === 'ValidationError') {
@@ -71,9 +76,9 @@ module.exports.getUser = (req, res) => {
     .then((targetUser) => res.send({ data: targetUser }))
     .catch((err) => {
       if (err.name === 'CastError') {
-        res.status(404).send({ message: 'Пользователь не найден' });
+        res.status(ERROR_CODE_404).send({ message: 'Пользователь не найден' });
       } else {
-        res.status(500).send({ message: 'Произошла ошибка' });
+        res.status(ERROR_CODE_500).send({ message: 'Произошла ошибка' });
       }
     });
 };
@@ -86,9 +91,9 @@ module.exports.getCurrentUser = (req, res) => {
     .then((CurrentUser) => res.send({ data: CurrentUser }))
     .catch((err) => {
       if (err.name === 'CastError') {
-        res.status(404).send({ message: 'Пользователь не найден' });
+        res.status(ERROR_CODE_404).send({ message: 'Пользователь не найден' });
       } else {
-        res.status(500).send({ message: 'Произошла ошибка' });
+        res.status(ERROR_CODE_500).send({ message: 'Произошла ошибка' });
       }
     });
 };
@@ -103,11 +108,11 @@ module.exports.updateUser = (req, res) => {
     .then((updatedUser) => res.send({ data: updatedUser }))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        res.status(400).send({
+        res.status(ERROR_CODE_400).send({
           message: 'Переданы некорректные данные в методы обновления профиля',
         });
       } else {
-        res.status(500).send({ message: 'Произошла ошибка' });
+        res.status(ERROR_CODE_500).send({ message: 'Произошла ошибка' });
       }
     });
 };
@@ -122,11 +127,11 @@ module.exports.updateUserAvatar = (req, res) => {
     .then((updatedAvatar) => res.send({ data: updatedAvatar }))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        res.status(400).send({
+        res.status(ERROR_CODE_400).send({
           message: 'Переданы некорректные данные в методы обновления аватара пользователя',
         });
       } else {
-        res.status(500).send({ message: 'Произошла ошибка' });
+        res.status(ERROR_CODE_500).send({ message: 'Произошла ошибка' });
       }
     });
 };
