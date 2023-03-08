@@ -3,6 +3,8 @@ const mongoose = require('mongoose');
 const { PORT = 3000 } = process.env;
 const app = express();
 
+
+
 mongoose.set('strictQuery', false);
 
 mongoose.connect(
@@ -20,9 +22,11 @@ app.use((req, res, next) => {
   };
   next();
 });
+
 app.use(express.json());
 app.use('/users', require('./routers/users'));
 app.use('/cards', require('./routers/cards'));
+app.use('/signin', require('./routers/login'));
 
 
 

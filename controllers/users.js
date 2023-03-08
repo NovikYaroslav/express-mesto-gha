@@ -24,7 +24,7 @@ module.exports.createUser = (req, res) => {
         res.status(404).send({ message: 'Заполните все обязательные поля' });
       }
       if (err.code === 11000) {
-        res.status(409).send({ message: 'Пользователь с такими данными уже существует' });
+        res.status(ERROR_CODE_404).send({ message: 'Пользователь с такими данными уже существует' });
       }
       if (err.name === 'ValidationError') {
         res.status(ERROR_CODE_400).send({
@@ -32,7 +32,7 @@ module.exports.createUser = (req, res) => {
             "Переданы некорректные данные в методы создания пользователя",
         });
       } else {
-        res.status(500).send({ message: "Произошла ошибка" });
+        res.status(ERROR_CODE_500).send({ message: "Произошла ошибка" });
       }
     });
 };
