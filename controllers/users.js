@@ -4,9 +4,9 @@ const user = require('../models/user');
 const { JWT_SECRET } = require('../config');
 
 const {
-  ERROR_CODE_400,
   ERROR_CODE_404,
   ERROR_CODE_401,
+  ERROR_CODE_400,
 } = require('../utils/errors');
 
 module.exports.login = (req, res, next) => {
@@ -24,7 +24,6 @@ module.exports.login = (req, res, next) => {
           res.send({ jwt });
           return;
         }
-        console.log('Пароль не совпал');
         next({ code: ERROR_CODE_401 });
         return;
       })
@@ -62,13 +61,8 @@ module.exports.createUser = (req, res, next) => {
     )
     .catch((err) => {
       if (!password || !email) {
-        console.log(err);
-        res
-          .status(ERROR_CODE_400)
-          .send({ message: 'Заполните все обязательные поля' });
-        return;
+        next({ code: ERROR_CODE_401 });
       } else {
-        console.log(err);
         next(err);
       }
     });
@@ -77,7 +71,13 @@ module.exports.createUser = (req, res, next) => {
 module.exports.getUser = (req, res, next) => {
   user
     .findById(req.params.userId)
-    .then((targetUser) => res.send({ data: targetUser }))
+    .then((targetUser) => {
+      if (targetUser === null) {
+        next({ code: ERROR_CODE_404 });
+      } else {
+        res.send({ data: targetUser });
+      }
+    })
     .catch(next);
 };
 
