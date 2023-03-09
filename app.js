@@ -14,7 +14,6 @@ const limiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 200,
 });
-const { ERROR_CODE_404 } = require('./middlewares/error-handler');
 
 const app = express();
 
@@ -57,8 +56,5 @@ app.use(auth);
 app.use('/users', require('./routers/users'));
 app.use('/cards', require('./routers/cards'));
 
-app.use((res) => {
-  res.status(ERROR_CODE_404).send({ message: 'Страница не найдена' });
-});
 app.use(errors());
 app.use(errorHandler);

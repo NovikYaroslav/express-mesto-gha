@@ -22,6 +22,9 @@ const errorHandler = (err, res) => {
   if (err.code === ERROR_CODE_401) {
     res.status(ERROR_CODE_401).send({ message: 'Пользователь не найден' });
   }
+  if (err.code === ERROR_CODE_401) {
+    res.status(ERROR_CODE_401).send({ message: 'Страница не найдена' });
+  }
   if (err.code === 11000) {
     res
       .status(ERROR_CODE_409)
