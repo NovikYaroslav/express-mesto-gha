@@ -32,23 +32,6 @@ const errorHandler = (err, res) => {
   } else {
     res.status(ERROR_CODE_500).send({ message: 'Произошла ошибка' });
   }
-  // const statusCode = err.statusCode || 500;
-
-  // const message =
-  //   statusCode === 500
-  //     ? `На сервере произошла ошибка: ${err.message}`
-  //     : err.message;
-
-  // res.status(statusCode).send({ message });
-
-  // next();
 };
 
-module.exports = {
-  ERROR_CODE_400,
-  ERROR_CODE_404,
-  ERROR_CODE_500,
-  ERROR_CODE_401,
-  ERROR_CODE_409,
-  errorHandler,
-};
+module.exports = errorHandler;

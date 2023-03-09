@@ -3,10 +3,8 @@ const jsonwebtoken = require('jsonwebtoken');
 const user = require('../models/user');
 const { JWT_SECRET } = require('../config');
 
-const {
-  ERROR_CODE_404,
-  ERROR_CODE_401,
-} = require('../middlewares/error-handler');
+const ERROR_CODE_404 = 404;
+const ERROR_CODE_401 = 401;
 
 module.exports.login = (req, res, next) => {
   const { email, password } = req.body;

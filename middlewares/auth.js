@@ -1,6 +1,7 @@
 const jsonwebtoken = require('jsonwebtoken');
 const { JWT_SECRET } = require('../config');
-const { ERROR_CODE_401 } = require('./error-handler');
+
+const ERROR_CODE_401 = 401;
 
 const auth = (req, res, next) => {
   console.log('работаю auth');
