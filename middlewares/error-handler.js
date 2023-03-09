@@ -8,14 +8,6 @@ const ERROR_CODE_401 = 401;
 
 const ERROR_CODE_409 = 409;
 
-module.exports = {
-  ERROR_CODE_400,
-  ERROR_CODE_404,
-  ERROR_CODE_500,
-  ERROR_CODE_401,
-  ERROR_CODE_409,
-};
-
 const errorHandler = (err, res) => {
   // console.log('Обработчик ошибок');
 
@@ -49,4 +41,11 @@ const errorHandler = (err, res) => {
   // next();
 };
 
-export default errorHandler;
+module.exports = {
+  ERROR_CODE_400,
+  ERROR_CODE_404,
+  ERROR_CODE_500,
+  ERROR_CODE_401,
+  ERROR_CODE_409,
+  errorHandler,
+};
