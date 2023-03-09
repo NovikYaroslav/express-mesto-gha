@@ -13,6 +13,7 @@ const limiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 200,
 });
+const { ERROR_CODE_404 } = require('../utils/errors');
 
 const app = express();
 
@@ -54,9 +55,8 @@ app.post(
 app.use(auth);
 app.use('/users', require('./routers/users'));
 app.use('/cards', require('./routers/cards'));
+app.use((req, res) => {
+  next({ code: ERROR_CODE_404 });
+});
 app.use(errors());
 app.use(errorHandler);
-
-// app.use((req, res) => {
-//   res.status(404).send({ message: 'Страница не найдена' });
-// });
