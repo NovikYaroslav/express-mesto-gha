@@ -8,12 +8,15 @@ const errorHandler = (err, req, res, next) => {
     ERROR_CODE_401,
   } = require('../utils/errors');
 
-  console.log('Обработчик ошибок');
+  // console.log('Обработчик ошибок');
 
   if (err.name === 'ValidationError') {
     res.status(ERROR_CODE_400).send({
       message: 'Переданы некорректные данные в методы создания пользователя',
     });
+  }
+  if (err.name === 'CastError') {
+    res.status(ERROR_CODE_404).send({ message: 'Пользователь не найден' });
   }
   if (err.code === ERROR_CODE_401) {
     res.status(ERROR_CODE_401).send({ message: 'Пользователь не найден' });

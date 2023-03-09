@@ -9,31 +9,6 @@ const {
   ERROR_CODE_401,
 } = require('../utils/errors');
 
-// module.exports.login = (req, res, next) => {
-//   const { email, password } = req.body;
-
-//   user
-//     .findOne({ email })
-//     .select('+password')
-//     .orFail(() => res.status(404).send({ message: 'Пользователь не найден' }))
-//     .then((user) =>
-//       bcrypt.compare(password, user.password).then((matched) => {
-//         if (matched) {
-//           return user;
-//         }
-//         return res.status(404).send({ message: 'Пользователь не найден' });
-//       })
-//     )
-//     .then((user) => {
-//       console.log('Делаю JWT');
-//       const jwt = jsonwebtoken.sign({ _id: user._id }, JWT_SECRET, {
-//         expiresIn: '7d',
-//       });
-//       res.send({ user, jwt });
-//     })
-//     .catch(next);
-// };
-
 module.exports.login = (req, res, next) => {
   const { email, password } = req.body;
   user
@@ -104,13 +79,6 @@ module.exports.getUser = (req, res, next) => {
     .findById(req.params.userId)
     .then((targetUser) => res.send({ data: targetUser }))
     .catch(next);
-  // .catch((err) => {
-  //   if (err.name === 'CastError') {
-  //     res.status(ERROR_CODE_404).send({ message: 'Пользователь не найден' });
-  //   } else {
-  //     res.status(ERROR_CODE_500).send({ message: 'Произошла ошибка' });
-  //   }
-  // });
 };
 
 module.exports.getCurrentUser = (req, res, next) => {
@@ -120,13 +88,6 @@ module.exports.getCurrentUser = (req, res, next) => {
     .findById(payload._id)
     .then((CurrentUser) => res.send({ data: CurrentUser }))
     .catch(next);
-  // .catch((err) => {
-  //   if (err.name === 'CastError') {
-  //     res.status(ERROR_CODE_404).send({ message: 'Пользователь не найден' });
-  //   } else {
-  //     res.status(ERROR_CODE_500).send({ message: 'Произошла ошибка' });
-  //   }
-  // });
 };
 
 module.exports.updateUser = (req, res, next) => {
@@ -138,15 +99,6 @@ module.exports.updateUser = (req, res, next) => {
     )
     .then((updatedUser) => res.send({ data: updatedUser }))
     .catch(next);
-  // .catch((err) => {
-  //   if (err.name === 'ValidationError') {
-  //     res.status(ERROR_CODE_400).send({
-  //       message: 'Переданы некорректные данные в методы обновления профиля',
-  //     });
-  //   } else {
-  //     res.status(ERROR_CODE_500).send({ message: 'Произошла ошибка' });
-  //   }
-  // });
 };
 
 module.exports.updateUserAvatar = (req, res, next) => {

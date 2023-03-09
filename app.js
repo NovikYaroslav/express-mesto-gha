@@ -51,8 +51,9 @@ app.post(
   }),
   createUser
 );
-app.use('/users', auth, require('./routers/users'));
-app.use('/cards', auth, require('./routers/cards'));
+app.use(auth);
+app.use('/users', require('./routers/users'));
+app.use('/cards', require('./routers/cards'));
 app.use(errors());
 app.use(errorHandler);
 

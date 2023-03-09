@@ -3,6 +3,7 @@ const { JWT_SECRET } = require('../config');
 const { ERROR_CODE_401 } = require('../utils/errors');
 
 const auth = (req, res, next) => {
+  console.log('работаю auth');
   const { authorization } = req.headers;
 
   if (!authorization || !authorization.startsWith('Bearer')) {
