@@ -20,7 +20,7 @@ router.patch(
       about: Joi.string().min(2).max(30),
     }),
   }),
-  updateUser
+  updateUser,
 );
 router.patch('/me/avatar', updateUserAvatar);
 

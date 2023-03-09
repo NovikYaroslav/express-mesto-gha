@@ -2,18 +2,19 @@ const express = require('express');
 const mongoose = require('mongoose');
 const rateLimit = require('express-rate-limit');
 const helmet = require('helmet');
+const { errors } = require('celebrate');
+const { celebrate, Joi } = require('celebrate');
 const { PORT } = require('./config');
 const { login } = require('./controllers/users');
 const { createUser } = require('./controllers/users');
 const auth = require('./middlewares/auth');
-const errorHandler = require('./middlewares/error-handler');
-const { celebrate, Joi } = require('celebrate');
-const { errors } = require('celebrate');
+const errorHandler = require('./middlewares/error-handler').default;
+
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 200,
 });
-const { ERROR_CODE_404 } = require('../utils/errors');
+const { ERROR_CODE_404 } = require('./middlewares/error-handler');
 
 const app = express();
 
@@ -36,7 +37,7 @@ app.post(
       password: Joi.string().required().min(2),
     }),
   }),
-  login
+  login,
 );
 app.post(
   '/signup',
@@ -50,13 +51,14 @@ app.post(
       })
       .unknown(true),
   }),
-  createUser
+  createUser,
 );
 app.use(auth);
 app.use('/users', require('./routers/users'));
 app.use('/cards', require('./routers/cards'));
-app.use((req, res) => {
-  next({ code: ERROR_CODE_404 });
+
+app.use((res) => {
+  res.status(ERROR_CODE_404).send({ message: 'Страница не найдена' });
 });
 app.use(errors());
 app.use(errorHandler);

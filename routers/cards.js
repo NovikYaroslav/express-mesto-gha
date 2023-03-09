@@ -18,7 +18,7 @@ router.post(
       link: Joi.string().min(2).required().max(30),
     }),
   }),
-  createCard
+  createCard,
 );
 router.delete('/:cardId', deleteCard);
 router.put('/:cardId/likes', likeCard);
