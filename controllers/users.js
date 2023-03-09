@@ -5,31 +5,52 @@ const { JWT_SECRET } = require('../config');
 
 const { ERROR_CODE_400, ERROR_CODE_404 } = require('../utils/errors');
 
+// module.exports.login = (req, res, next) => {
+//   const { email, password } = req.body;
+
+//   user
+//     .findOne({ email })
+//     .select('+password')
+//     .orFail(() => res.status(404).send({ message: 'Пользователь не найден' }))
+//     .then((user) =>
+//       bcrypt.compare(password, user.password).then((matched) => {
+//         if (matched) {
+//           return user;
+//         }
+//         return res.status(404).send({ message: 'Пользователь не найден' });
+//       })
+//     )
+//     .then((user) => {
+//       console.log('Делаю JWT');
+//       const jwt = jsonwebtoken.sign({ _id: user._id }, JWT_SECRET, {
+//         expiresIn: '7d',
+//       });
+//       res.send({ user, jwt });
+//     })
+//     .catch(next);
+// };
+
 module.exports.login = (req, res, next) => {
   const { email, password } = req.body;
-
   user
     .findOne({ email })
     .select('+password')
-    .orFail(() => res
-      .status(ERROR_CODE_404)
-      .send({ message: 'Пользователь не найден Login' }))
-    .then((userData) => bcrypt.compare(password, userData.password).then((matched) => {
-      if (matched) {
-        return user;
-      }
-      return res
-        .status(ERROR_CODE_404)
-        .send({ message: 'Пользователь не найден Login Hash' });
-    }))
-    .then((loggedUser) => {
-      const jwt = jsonwebtoken.sign({ _id: loggedUser._id }, JWT_SECRET, {
-        expiresIn: '7d',
-      });
-      res.send({ jwt });
-    })
+    .orFail(() => next({ code: ERROR_CODE_404 }))
+    .then((userData) =>
+      bcrypt.compare(password, userData.password).then((matched) => {
+        if (matched) {
+          const jwt = jsonwebtoken.sign({ _id: userData._id }, JWT_SECRET, {
+            expiresIn: '7d',
+          });
+          res.send({ jwt });
+          return;
+        }
+        console.log('Пароль не совпал');
+        next({ code: ERROR_CODE_404 });
+        return;
+      })
+    )
     .catch(next);
-  // .catch((err) => res.status(ERROR_CODE_404).send({ message: err.message }));
 };
 
 module.exports.getUsers = (req, res, next) => {
@@ -41,41 +62,38 @@ module.exports.getUsers = (req, res, next) => {
 };
 
 module.exports.createUser = (req, res, next) => {
-  const {
-    name, about, avatar, email, password,
-  } = req.body;
+  const { name, about, avatar, email, password } = req.body;
   bcrypt
     .hash(password, 10)
-    .then((hash) => user.create({
-      name,
-      about,
-      avatar,
-      email,
-      password: hash,
-    }))
-    .then((newUser) => res.send({ data: newUser.email }))
+    .then((hash) =>
+      user.create({
+        name,
+        about,
+        avatar,
+        email,
+        password: hash,
+      })
+    )
+    .then((newUser) =>
+      res.send({
+        email: newUser.email,
+        name: newUser.name,
+        about: newUser.about,
+        avatar: newUser.avatar,
+      })
+    )
     .catch((err) => {
       if (!password || !email) {
+        console.log(err);
         res
           .status(ERROR_CODE_400)
           .send({ message: 'Заполните все обязательные поля' });
+        return;
       } else {
+        console.log(err);
         next(err);
       }
     });
-  //   if (err.code === 11000) {
-  //     res
-  //       .status(ERROR_CODE_409)
-  //       .send({ message: 'Пользователь с такими данными уже существует' });
-  //   }
-  //   if (err.name === 'ValidationError') {
-  //     res.status(ERROR_CODE_400).send({
-  //       message: 'Переданы некорректные данные в методы создания пользователя',
-  //     });
-  //   } else {
-  //     res.status(ERROR_CODE_500).send({ message: 'Произошла ошибка' });
-  //   }
-  // });
 };
 
 module.exports.getUser = (req, res, next) => {
@@ -113,7 +131,7 @@ module.exports.updateUser = (req, res, next) => {
     .findByIdAndUpdate(
       req.user._id,
       { name: req.body.name, about: req.body.about },
-      { new: true, runValidators: true },
+      { new: true, runValidators: true }
     )
     .then((updatedUser) => res.send({ data: updatedUser }))
     .catch(next);
@@ -133,7 +151,7 @@ module.exports.updateUserAvatar = (req, res, next) => {
     .findByIdAndUpdate(
       req.user._id,
       { avatar: req.body.avatar },
-      { new: true, runValidators: true },
+      { new: true, runValidators: true }
     )
     .then((updatedAvatar) => res.send({ data: updatedAvatar }))
     .catch(next);
