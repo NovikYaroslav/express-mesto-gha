@@ -5,6 +5,7 @@ const errorHandler = (err, req, res, next) => {
     ERROR_CODE_400,
     ERROR_CODE_404,
     ERROR_CODE_409,
+    ERROR_CODE_401,
   } = require('../utils/errors');
 
   console.log('Обработчик ошибок');
@@ -14,8 +15,8 @@ const errorHandler = (err, req, res, next) => {
       message: 'Переданы некорректные данные в методы создания пользователя',
     });
   }
-  if (err.code === ERROR_CODE_404) {
-    res.status(ERROR_CODE_404).send({ message: 'Пользователь не найден' });
+  if (err.code === ERROR_CODE_401) {
+    res.status(ERROR_CODE_401).send({ message: 'Пользователь не найден' });
   }
   if (err.code === 11000) {
     res

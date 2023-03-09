@@ -3,7 +3,11 @@ const jsonwebtoken = require('jsonwebtoken');
 const user = require('../models/user');
 const { JWT_SECRET } = require('../config');
 
-const { ERROR_CODE_400, ERROR_CODE_404 } = require('../utils/errors');
+const {
+  ERROR_CODE_400,
+  ERROR_CODE_404,
+  ERROR_CODE_401,
+} = require('../utils/errors');
 
 // module.exports.login = (req, res, next) => {
 //   const { email, password } = req.body;
@@ -35,7 +39,7 @@ module.exports.login = (req, res, next) => {
   user
     .findOne({ email })
     .select('+password')
-    .orFail(() => next({ code: ERROR_CODE_404 }))
+    .orFail(() => next({ code: ERROR_CODE_401 }))
     .then((userData) =>
       bcrypt.compare(password, userData.password).then((matched) => {
         if (matched) {
@@ -46,7 +50,7 @@ module.exports.login = (req, res, next) => {
           return;
         }
         console.log('Пароль не совпал');
-        next({ code: ERROR_CODE_404 });
+        next({ code: ERROR_CODE_401 });
         return;
       })
     )
@@ -58,7 +62,6 @@ module.exports.getUsers = (req, res, next) => {
     .find({})
     .then((users) => res.send({ data: users }))
     .catch(next);
-  // .catch(() => res.status(ERROR_CODE_500).send({ message: 'Произошла ошибка' }));
 };
 
 module.exports.createUser = (req, res, next) => {
