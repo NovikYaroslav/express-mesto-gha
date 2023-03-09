@@ -8,7 +8,7 @@ const { PORT } = require('./config');
 const { login } = require('./controllers/users');
 const { createUser } = require('./controllers/users');
 const auth = require('./middlewares/auth');
-const errorHandler = require('./middlewares/error-handler').default;
+const errorHandler = require('./middlewares/error-handler');
 
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000,
