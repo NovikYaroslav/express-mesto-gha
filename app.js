@@ -36,7 +36,7 @@ app.post(
       password: Joi.string().required().min(2),
     }),
   }),
-  login,
+  login
 );
 app.post(
   '/signup',
@@ -45,12 +45,21 @@ app.post(
       .keys({
         name: Joi.string().min(2).max(30),
         about: Joi.string().min(2).max(30),
-        email: Joi.string().email().required(),
+        avatar: Joi.string()
+          .pattern(
+            /(http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-/]))?/
+          )
+          .messages({
+            'string.pattern.base': 'Введите корректный url аватара',
+          }),
+        email: Joi.string().email().required().messages({
+          'string.email': 'Введите корректный email',
+        }),
         password: Joi.string().required().min(2),
       })
       .unknown(true),
   }),
-  createUser,
+  createUser
 );
 app.use(auth);
 app.use('/users', require('./routers/users'));
@@ -58,3 +67,5 @@ app.use('/cards', require('./routers/cards'));
 
 app.use(errors());
 app.use(errorHandler);
+
+// (https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|www\.[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9]+\.[^\s]{2,}|www\.[a-zA-Z0-9]+\.[^\s]{2,})
