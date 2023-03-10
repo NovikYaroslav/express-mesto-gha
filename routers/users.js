@@ -30,6 +30,20 @@ router.patch(
   }),
   updateUser
 );
-router.patch('/me/avatar', updateUserAvatar);
+router.patch(
+  '/me/avatar',
+  celebrate({
+    body: Joi.object().keys({
+      avatar: Joi.string()
+        .pattern(
+          /(http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-/]))?/
+        )
+        .messages({
+          'string.pattern.base': 'Введите корректный url аватара',
+        }),
+    }),
+  }),
+  updateUserAvatar
+);
 
 module.exports = router;
