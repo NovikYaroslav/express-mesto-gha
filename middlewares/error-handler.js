@@ -9,7 +9,7 @@ const ERROR_CODE_401 = 401;
 const ERROR_CODE_409 = 409;
 
 const errorHandler = (err, res) => {
-  // console.log('Обработчик ошибок');
+  console.log(err.code);
 
   if (err.name === 'ValidationError') {
     res.status(ERROR_CODE_400).send({
@@ -22,8 +22,8 @@ const errorHandler = (err, res) => {
   if (err.code === ERROR_CODE_401) {
     res.status(ERROR_CODE_401).send({ message: 'Пользователь не найден' });
   }
-  if (err.code === ERROR_CODE_401) {
-    res.status(ERROR_CODE_401).send({ message: 'Страница не найдена' });
+  if (err.code === ERROR_CODE_404) {
+    res.status(ERROR_CODE_404).send({ message: 'Страница не найдена' });
   }
   if (err.code === 11000) {
     res

@@ -10,8 +10,8 @@ const {
 } = require('../controllers/users');
 
 router.get('/', getUsers);
-router.get('/:userId', getUser);
 router.get('/me', getCurrentUser);
+router.get('/:userId', getUser);
 router.patch(
   '/me',
   celebrate({
@@ -20,7 +20,7 @@ router.patch(
       about: Joi.string().min(2).max(30),
     }),
   }),
-  updateUser,
+  updateUser
 );
 router.patch('/me/avatar', updateUserAvatar);
 

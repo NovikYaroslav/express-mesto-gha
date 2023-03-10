@@ -18,8 +18,8 @@
     ],
     "rules": {
       "no-underscore-dangle": ["error", { "allow": ["_id"] }],
-      "no-console": "off"
-      // "eslint-disable": true
+      "no-console": "off",
+      "eslint-disable": true
 
     }
 }
