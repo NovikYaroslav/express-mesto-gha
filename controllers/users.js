@@ -4,24 +4,18 @@ const user = require('../models/user');
 const { JWT_SECRET } = require('../config');
 const {
   BadRequestError,
-  AuthorizedError,
+  AuthorizationError,
   PermissionError,
   NotFoundError,
   DublicationError,
 } = require('../utils/errors');
-
-const ERROR_CODE_404 = 404;
-const ERROR_CODE_401 = 401;
-const ERROR_CODE_409 = 409;
 
 module.exports.login = (req, res, next) => {
   const { email, password } = req.body;
   user
     .findOne({ email })
     .select('+password')
-    .orFail(() =>
-      res.status(ERROR_CODE_401).send({ message: 'Пользователь не найден' })
-    )
+    .orFail(() => next(new AuthorizationError('Пользователь не найден')))
     .then((userData) =>
       bcrypt.compare(password, userData.password).then((matched) => {
         if (matched) {
@@ -31,7 +25,7 @@ module.exports.login = (req, res, next) => {
           res.send({ jwt });
           return;
         }
-        next({ code: ERROR_CODE_401 });
+        next(new AuthorizationError('Пользователь не найден'));
       })
     )
     .catch(next);
@@ -86,7 +80,7 @@ module.exports.getUser = (req, res, next) => {
     .findById(req.params.userId)
     .then((targetUser) => {
       if (targetUser === null) {
-        next({ code: ERROR_CODE_404 });
+        next(new NotFoundError('Запрашиваемый пользователь не найден'));
       } else {
         res.send({ data: targetUser });
       }
@@ -120,14 +114,15 @@ module.exports.updateUserAvatar = (req, res, next) => {
       { new: true, runValidators: true }
     )
     .then((updatedAvatar) => res.send({ data: updatedAvatar }))
-    .catch(next);
-  // .catch((err) => {
-  //   if (err.name === 'ValidationError') {
-  //     res.status(ERROR_CODE_400).send({
-  //       message: 'Переданы некорректные данные в методы обновления аватара пользователя',
-  //     });
-  //   } else {
-  //     res.status(ERROR_CODE_500).send({ message: 'Произошла ошибка' });
-  //   }
-  // });
+    .catch((err) => {
+      if (err.name === 'ValidationError') {
+        туче(
+          new BadRequestError(
+            'Переданы некорректные данные в методы создания пользователя'
+          )
+        );
+      } else {
+        res.status(ERROR_CODE_500).send({ message: 'Произошла ошибка' });
+      }
+    });
 };

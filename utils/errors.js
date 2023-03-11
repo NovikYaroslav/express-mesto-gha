@@ -5,7 +5,7 @@ class BadRequestError extends Error {
   }
 }
 
-class AuthorizedError extends Error {
+class AuthorizationError extends Error {
   constructor(message) {
     super(message);
     this.statusCode = 401;
@@ -35,7 +35,7 @@ class DublicationError extends Error {
 
 module.exports = {
   BadRequestError,
-  AuthorizedError,
+  AuthorizationError,
   PermissionError,
   NotFoundError,
   DublicationError,
