@@ -1,11 +1,42 @@
-const ERROR_CODE_400 = 400;
+// class BadRequestError extends Error {
+//   constructor(message) {
+//     super(message);
+//     this.statusCode = 400;
+//   }
+// }
 
-const ERROR_CODE_404 = 404;
+// class AuthorizationError extends Error {
+//   constructor(message) {
+//     super(message);
+//     this.statusCode = 401;
+//   }
+// }
 
-const ERROR_CODE_500 = 500;
+// class PermissionError extends Error {
+//   constructor(message) {
+//     super(message);
+//     this.statusCode = 403;
+//   }
+// }
 
-module.exports = {
-  ERROR_CODE_400,
-  ERROR_CODE_404,
-  ERROR_CODE_500,
-};
+// class NotFoundError extends Error {
+//   constructor(message) {
+//     super(message);
+//     this.statusCode = 404;
+//   }
+// }
+
+// class DublicationError extends Error {
+//   constructor(message) {
+//     super(message);
+//     this.statusCode = 409;
+//   }
+// }
+
+// module.exports = {
+//   BadRequestError,
+//   AuthorizationError,
+//   PermissionError,
+//   NotFoundError,
+//   DublicationError,
+// };

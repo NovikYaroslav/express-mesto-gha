@@ -1,50 +1,94 @@
+const bcrypt = require('bcrypt');
+const jsonwebtoken = require('jsonwebtoken');
 const user = require('../models/user');
-const { ERROR_CODE_400, ERROR_CODE_404, ERROR_CODE_500 } = require('../utils/errors');
+const { JWT_SECRET } = require('../config');
+const BadRequestError = require('../utils/errors/BadRequestError');
+const AuthorizationError = require('../utils/errors/AuthorizationError');
+const NotFoundError = require('../utils/errors/NotFoundError');
+const DublicationError = require('../utils/errors/DublicationError');
 
-module.exports.getUsers = (req, res) => {
+module.exports.login = (req, res, next) => {
+  const { email, password } = req.body;
+  user
+    .findOne({ email })
+    .select('+password')
+    .orFail(() => next(new AuthorizationError('Пользователь не найден')))
+    .then((userData) => bcrypt.compare(password, userData.password).then((matched) => {
+      if (matched) {
+        const jwt = jsonwebtoken.sign({ _id: userData._id }, JWT_SECRET, {
+          expiresIn: '7d',
+        });
+        res.send({ jwt });
+        return;
+      }
+      next(new AuthorizationError('Пользователь не найден'));
+    }))
+    .catch(next);
+};
+
+module.exports.getUsers = (req, res, next) => {
   user
     .find({})
     .then((users) => res.send({ data: users }))
-    .catch(() => res.status(ERROR_CODE_500).send({ message: 'Произошла ошибка' }));
+    .catch(next);
 };
 
-module.exports.createUser = (req, res) => {
-  const { name, about, avatar } = req.body;
-  user
-    .create({ name, about, avatar })
-    .then((newUser) => res.send({ data: newUser }))
+module.exports.createUser = (req, res, next) => {
+  const {
+    name, about, avatar, email, password,
+  } = req.body;
+  bcrypt
+    .hash(password, 10)
+    .then((hash) => user.create({
+      name,
+      about,
+      avatar,
+      email,
+      password: hash,
+    }))
+    .then((newUser) => res.send({
+      email: newUser.email,
+      name: newUser.name,
+      about: newUser.about,
+      avatar: newUser.avatar,
+    }))
     .catch((err) => {
-      if (err.name === 'ValidationError') {
-        res.status(ERROR_CODE_400).send({
-          message:
+      if (err.name === 'CastError') {
+        next(
+          new BadRequestError(
             'Переданы некорректные данные в методы создания пользователя',
-        });
+          ),
+        );
+      }
+      if (err.code === 11000) {
+        next(new DublicationError('Пользователь с таким email уже существует'));
       } else {
-        res.status(ERROR_CODE_500).send({ message: 'Произошла ошибка' });
+        next(err);
       }
     });
 };
 
-module.exports.getUser = (req, res) => {
+module.exports.getUser = (req, res, next) => {
   user
     .findById(req.params.userId)
     .then((targetUser) => {
-      if (targetUser === null) {
-        res
-          .status(ERROR_CODE_404)
-          .send({ message: 'Пользователь нет в базе данных' });
-      } else { res.send({ data: targetUser }); }
-    })
-    .catch((err) => {
-      if (err.name === 'CastError') {
-        res.status(ERROR_CODE_400).send({ message: 'Некорректный id пользователя' });
+      if (!targetUser) {
+        next(new NotFoundError('Запрашиваемый пользователь не найден'));
       } else {
-        res.status(ERROR_CODE_500).send({ message: 'Произошла ошибка' });
+        res.send({ data: targetUser });
       }
-    });
+    })
+    .catch(next);
 };
 
-module.exports.updateUser = (req, res) => {
+module.exports.getCurrentUser = (req, res, next) => {
+  user
+    .findById(req.user._id)
+    .then((CurrentUser) => res.send({ data: CurrentUser }))
+    .catch(next);
+};
+
+module.exports.updateUser = (req, res, next) => {
   user
     .findByIdAndUpdate(
       req.user._id,
@@ -52,18 +96,10 @@ module.exports.updateUser = (req, res) => {
       { new: true, runValidators: true },
     )
     .then((updatedUser) => res.send({ data: updatedUser }))
-    .catch((err) => {
-      if (err.name === 'ValidationError') {
-        res.status(ERROR_CODE_400).send({
-          message: 'Переданы некорректные данные в методы обновления профиля',
-        });
-      } else {
-        res.status(ERROR_CODE_500).send({ message: 'Произошла ошибка' });
-      }
-    });
+    .catch(next);
 };
 
-module.exports.updateUserAvatar = (req, res) => {
+module.exports.updateUserAvatar = (req, res, next) => {
   user
     .findByIdAndUpdate(
       req.user._id,
@@ -73,12 +109,13 @@ module.exports.updateUserAvatar = (req, res) => {
     .then((updatedAvatar) => res.send({ data: updatedAvatar }))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        res.status(ERROR_CODE_400).send({
-          message:
-            'Переданы некорректные данные в методы обновления аватара пользователя',
-        });
+        next(
+          new BadRequestError(
+            'Переданы некорректные данные в методы создания пользователя',
+          ),
+        );
       } else {
-        res.status(ERROR_CODE_500).send({ message: 'Произошла ошибка' });
+        next(err);
       }
     });
 };
