@@ -64,5 +64,5 @@ app.post(
 app.use(auth);
 app.use('/users', require('./routers/users'));
 app.use('/cards', require('./routers/cards'));
-// app.use(errors());
+app.use(errors());
 app.use(errorHandler);
