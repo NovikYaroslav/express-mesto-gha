@@ -14,7 +14,9 @@ router.post(
   '/',
   celebrate({
     body: Joi.object().keys({
+      name: Joi.string().required(),
       link: Joi.string()
+        .required()
         .pattern(
           /(http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-/]))?/
         )
@@ -38,7 +40,7 @@ router.put(
   '/:cardId/likes',
   celebrate({
     params: Joi.object().keys({
-      id: Joi.string().required().hex().length(24),
+      cardId: Joi.string().required().hex().length(24),
     }),
   }),
   likeCard

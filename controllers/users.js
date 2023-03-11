@@ -5,7 +5,6 @@ const { JWT_SECRET } = require('../config');
 const {
   BadRequestError,
   AuthorizationError,
-  PermissionError,
   NotFoundError,
   DublicationError,
 } = require('../utils/errors');

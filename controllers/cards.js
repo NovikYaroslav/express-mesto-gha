@@ -1,10 +1,17 @@
 const card = require('../models/card');
 
+const {
+  BadRequestError,
+  AuthorizationError,
+  PermissionError,
+  NotFoundError,
+  DublicationError,
+} = require('../utils/errors');
+
 module.exports.getCards = (req, res, next) => {
   card
     .find({})
     .then((cards) => res.send({ data: cards }))
-    // .catch(() => res.status(500).send({ message: 'Произошла ошибка' }));
     .catch(next);
 };
 
@@ -29,7 +36,13 @@ module.exports.createCard = (req, res, next) => {
 module.exports.deleteCard = (req, res, next) => {
   card
     .findByIdAndRemove(req.params.cardId)
-    .then((targetCard) => res.send({ data: targetCard }))
+    .then((targetCard) => {
+      if (!targetCard) {
+        next(new NotFoundError('Карточка с таким id не найдена'));
+      } else {
+        res.send({ data: targetCard });
+      }
+    })
     .catch(next);
   // .catch((err) => {
   //   if (err.name === 'CastError') {
@@ -45,9 +58,15 @@ module.exports.likeCard = (req, res, next) => {
     .findByIdAndUpdate(
       req.params.cardId,
       { $addToSet: { likes: req.user._id } },
-      { new: true },
+      { new: true }
     )
-    .then((targetCard) => res.send({ data: targetCard }))
+    .then((targetCard) => {
+      if (!targetCard) {
+        next(new NotFoundError('Карточка с таким id не найдена'));
+      } else {
+        res.send({ data: targetCard });
+      }
+    })
     .catch(next);
   // .catch((err) => {
   //   if (err.name === 'CastError') {
@@ -63,9 +82,15 @@ module.exports.dislikeCard = (req, res, next) => {
     .findByIdAndUpdate(
       req.params.cardId,
       { $pull: { likes: req.user._id } },
-      { new: true },
+      { new: true }
     )
-    .then((targetCard) => res.send({ data: targetCard }))
+    .then((targetCard) => {
+      if (!targetCard) {
+        next(new NotFoundError('Карточка с таким id не найдена'));
+      } else {
+        res.send({ data: targetCard });
+      }
+    })
     .catch(next);
   // .catch((err) => {
   //   if (err.name === 'CastError') {
