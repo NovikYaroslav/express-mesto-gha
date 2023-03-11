@@ -1,7 +1,7 @@
 const bcrypt = require('bcrypt');
 const jsonwebtoken = require('jsonwebtoken');
 const user = require('../models/user');
-const { JWT_SECRET } = require('../config');
+const { JWT_SECRET } = require('../utils/const');
 const BadRequestError = require('../utils/errors/BadRequestError');
 const AuthorizationError = require('../utils/errors/AuthorizationError');
 const NotFoundError = require('../utils/errors/NotFoundError');
@@ -53,7 +53,7 @@ module.exports.createUser = (req, res, next) => {
       avatar: newUser.avatar,
     }))
     .catch((err) => {
-      if (err.name === 'CastError') {
+      if (err.name === 'ValidationError') {
         next(
           new BadRequestError(
             'Переданы некорректные данные в методы создания пользователя',
@@ -96,7 +96,17 @@ module.exports.updateUser = (req, res, next) => {
       { new: true, runValidators: true },
     )
     .then((updatedUser) => res.send({ data: updatedUser }))
-    .catch(next);
+    .catch((err) => {
+      if (err.name === 'ValidationError') {
+        next(
+          new BadRequestError(
+            'Переданы некорректные данные в методы обновления пользователя',
+          ),
+        );
+      } else {
+        next(err);
+      }
+    });
 };
 
 module.exports.updateUserAvatar = (req, res, next) => {

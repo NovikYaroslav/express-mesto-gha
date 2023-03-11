@@ -1,5 +1,5 @@
 const card = require('../models/card');
-
+const BadRequestError = require('../utils/errors/BadRequestError');
 const PermissionError = require('../utils/errors/PermissionError');
 const NotFoundError = require('../utils/errors/NotFoundError');
 
@@ -15,26 +15,18 @@ module.exports.createCard = (req, res, next) => {
   card
     .create({ name, link, owner: req.user._id })
     .then((newCard) => res.send({ data: newCard }))
-    .catch(next);
+    .catch((err) => {
+      if (err.name === 'ValidationError') {
+        next(
+          new BadRequestError(
+            'Переданы некорректные данные в методы создания карточки',
+          ),
+        );
+      } else {
+        next(err);
+      }
+    });
 };
-
-// module.exports.deleteCard = (req, res, next) => {
-//   card
-//     .findByIdAndRemove(req.params.cardId)
-//     .orFail(() => next(new NotFoundError('Карточка с таким id не найдена')))
-//     .then((targetCard) => {
-//       if (req.user._id === targetCard.owner.toString()) {
-//         res.send({ message: 'Карточка удалена' });
-//       } else {
-//         next(
-//           new PermissionError(
-//             'Невозможно удалить карточку другого пользователя',
-//           ),
-//         );
-//       }
-//     })
-//     .catch(next);
-// };
 
 module.exports.deleteCard = (req, res, next) => {
   card

@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const validator = require('validator');
+const { URL_REGEX } = require('../utils/const');
 
 const { Schema } = mongoose;
 
@@ -23,8 +24,7 @@ const userSchema = new Schema(
         'https://pictures.s3.yandex.net/resources/jacques-cousteau_1604399756.png',
       validate: {
         validator(val) {
-          const urlRegex = /(http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-/]))?/;
-          return urlRegex.test(val);
+          return URL_REGEX.test(val);
         },
         message: 'Поле "avatar" должно быть валидным url-адресом',
       },

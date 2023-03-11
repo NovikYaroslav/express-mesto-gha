@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const { URL_REGEX } = require('../utils/const');
 
 const { Schema } = mongoose;
 
@@ -13,9 +14,16 @@ const cardSchema = new Schema(
     link: {
       type: String,
       required: true,
+      validate: {
+        validator(val) {
+          return URL_REGEX.test(val);
+        },
+        message: 'Поле "link" должно быть валидным url-адресом',
+      },
     },
     owner: {
       type: mongoose.Schema.Types.ObjectId,
+      required: true,
       ref: 'user',
     },
     likes: {

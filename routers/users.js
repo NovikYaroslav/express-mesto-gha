@@ -1,5 +1,6 @@
 const router = require('express').Router();
 const { celebrate, Joi } = require('celebrate');
+const { URL_REGEX } = require('../utils/const');
 
 const {
   getUsers,
@@ -34,13 +35,9 @@ router.patch(
   '/me/avatar',
   celebrate({
     body: Joi.object().keys({
-      avatar: Joi.string()
-        .pattern(
-          /(http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-/]))?/,
-        )
-        .messages({
-          'string.pattern.base': 'Введите корректный url аватара',
-        }),
+      avatar: Joi.string().pattern(URL_REGEX).messages({
+        'string.pattern.base': 'Введите корректный url аватара',
+      }),
     }),
   }),
   updateUserAvatar,

@@ -1,5 +1,6 @@
 const router = require('express').Router();
 const { celebrate, Joi } = require('celebrate');
+const { URL_REGEX } = require('../utils/const');
 
 const {
   getCards,
@@ -15,14 +16,9 @@ router.post(
   celebrate({
     body: Joi.object().keys({
       name: Joi.string().required().min(2).max(30),
-      link: Joi.string()
-        .required()
-        .pattern(
-          /(http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-/]))?/,
-        )
-        .messages({
-          'string.pattern.base': 'Введите корректный url карточки',
-        }),
+      link: Joi.string().required().pattern(URL_REGEX).messages({
+        'string.pattern.base': 'Введите корректный url карточки',
+      }),
     }),
   }),
   createCard,
