@@ -84,13 +84,8 @@ module.exports.dislikeCard = (req, res, next) => {
       { $pull: { likes: req.user._id } },
       { new: true }
     )
-    .then((targetCard) => {
-      if (!targetCard) {
-        next(new NotFoundError('Карточка с таким id не найдена'));
-      } else {
-        res.send({ data: targetCard });
-      }
-    })
+    .orFail(() => next(new NotFoundError('Карточка с таким id не найдена')))
+    .then((targetCard) => res.send({ data: targetCard }))
     .catch(next);
   // .catch((err) => {
   //   if (err.name === 'CastError') {
