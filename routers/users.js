@@ -18,7 +18,7 @@ router.get(
       userId: Joi.string().required().hex().length(24),
     }),
   }),
-  getUser
+  getUser,
 );
 router.patch(
   '/me',
@@ -28,7 +28,7 @@ router.patch(
       about: Joi.string().min(2).max(30),
     }),
   }),
-  updateUser
+  updateUser,
 );
 router.patch(
   '/me/avatar',
@@ -36,14 +36,14 @@ router.patch(
     body: Joi.object().keys({
       avatar: Joi.string()
         .pattern(
-          /(http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-/]))?/
+          /(http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-/]))?/,
         )
         .messages({
           'string.pattern.base': 'Введите корректный url аватара',
         }),
     }),
   }),
-  updateUserAvatar
+  updateUserAvatar,
 );
 
 module.exports = router;

@@ -2,12 +2,10 @@ const bcrypt = require('bcrypt');
 const jsonwebtoken = require('jsonwebtoken');
 const user = require('../models/user');
 const { JWT_SECRET } = require('../config');
-const {
-  BadRequestError,
-  AuthorizationError,
-  NotFoundError,
-  DublicationError,
-} = require('../utils/errors');
+const BadRequestError = require('../utils/errors/BadRequestError');
+const AuthorizationError = require('../utils/errors/AuthorizationError');
+const NotFoundError = require('../utils/errors/NotFoundError');
+const DublicationError = require('../utils/errors/DublicationError');
 
 module.exports.login = (req, res, next) => {
   const { email, password } = req.body;
@@ -15,18 +13,16 @@ module.exports.login = (req, res, next) => {
     .findOne({ email })
     .select('+password')
     .orFail(() => next(new AuthorizationError('Пользователь не найден')))
-    .then((userData) =>
-      bcrypt.compare(password, userData.password).then((matched) => {
-        if (matched) {
-          const jwt = jsonwebtoken.sign({ _id: userData._id }, JWT_SECRET, {
-            expiresIn: '7d',
-          });
-          res.send({ jwt });
-          return;
-        }
-        next(new AuthorizationError('Пользователь не найден'));
-      })
-    )
+    .then((userData) => bcrypt.compare(password, userData.password).then((matched) => {
+      if (matched) {
+        const jwt = jsonwebtoken.sign({ _id: userData._id }, JWT_SECRET, {
+          expiresIn: '7d',
+        });
+        res.send({ jwt });
+        return;
+      }
+      next(new AuthorizationError('Пользователь не найден'));
+    }))
     .catch(next);
 };
 
@@ -38,32 +34,30 @@ module.exports.getUsers = (req, res, next) => {
 };
 
 module.exports.createUser = (req, res, next) => {
-  const { name, about, avatar, email, password } = req.body;
+  const {
+    name, about, avatar, email, password,
+  } = req.body;
   bcrypt
     .hash(password, 10)
-    .then((hash) =>
-      user.create({
-        name,
-        about,
-        avatar,
-        email,
-        password: hash,
-      })
-    )
-    .then((newUser) =>
-      res.send({
-        email: newUser.email,
-        name: newUser.name,
-        about: newUser.about,
-        avatar: newUser.avatar,
-      })
-    )
+    .then((hash) => user.create({
+      name,
+      about,
+      avatar,
+      email,
+      password: hash,
+    }))
+    .then((newUser) => res.send({
+      email: newUser.email,
+      name: newUser.name,
+      about: newUser.about,
+      avatar: newUser.avatar,
+    }))
     .catch((err) => {
       if (err.name === 'CastError') {
         next(
           new BadRequestError(
-            'Переданы некорректные данные в методы создания пользователя'
-          )
+            'Переданы некорректные данные в методы создания пользователя',
+          ),
         );
       }
       if (err.code === 11000) {
@@ -99,7 +93,7 @@ module.exports.updateUser = (req, res, next) => {
     .findByIdAndUpdate(
       req.user._id,
       { name: req.body.name, about: req.body.about },
-      { new: true, runValidators: true }
+      { new: true, runValidators: true },
     )
     .then((updatedUser) => res.send({ data: updatedUser }))
     .catch(next);
@@ -110,15 +104,15 @@ module.exports.updateUserAvatar = (req, res, next) => {
     .findByIdAndUpdate(
       req.user._id,
       { avatar: req.body.avatar },
-      { new: true, runValidators: true }
+      { new: true, runValidators: true },
     )
     .then((updatedAvatar) => res.send({ data: updatedAvatar }))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        туче(
+        next(
           new BadRequestError(
-            'Переданы некорректные данные в методы создания пользователя'
-          )
+            'Переданы некорректные данные в методы создания пользователя',
+          ),
         );
       } else {
         next(err);

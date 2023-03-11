@@ -9,7 +9,7 @@ const { login } = require('./controllers/users');
 const { createUser } = require('./controllers/users');
 const auth = require('./middlewares/auth');
 const errorHandler = require('./middlewares/error-handler');
-const { NotFoundError } = require('./utils/errors');
+const NotFoundError = require('./utils/errors/NotFoundError');
 
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000,
@@ -37,7 +37,7 @@ app.post(
       password: Joi.string().required().min(2),
     }),
   }),
-  login
+  login,
 );
 app.post(
   '/signup',
@@ -48,7 +48,7 @@ app.post(
         about: Joi.string().min(2).max(30),
         avatar: Joi.string()
           .pattern(
-            /(http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-/]))?/
+            /(http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-/]))?/,
           )
           .messages({
             'string.pattern.base': 'Введите корректный url аватара',
@@ -60,11 +60,12 @@ app.post(
       })
       .unknown(true),
   }),
-  createUser
+  createUser,
 );
 app.use(auth);
 app.use('/users', require('./routers/users'));
 app.use('/cards', require('./routers/cards'));
+
 app.use('*', () => {
   throw new NotFoundError('Запрашиваемая страница не найдена');
 });

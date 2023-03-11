@@ -1,6 +1,7 @@
 const card = require('../models/card');
 
-const { PermissionError, NotFoundError } = require('../utils/errors');
+const PermissionError = require('../utils/errors/PermissionError');
+const NotFoundError = require('../utils/errors/NotFoundError');
 
 module.exports.getCards = (req, res, next) => {
   card
@@ -23,13 +24,13 @@ module.exports.deleteCard = (req, res, next) => {
     .findByIdAndRemove(req.params.cardId)
     .orFail(() => next(new NotFoundError('Карточка с таким id не найдена')))
     .then((targetCard) => {
-      if (req.user._id == targetCard.owner) {
+      if (req.user._id === targetCard.owner) {
         res.send({ message: 'Карточка удалена' });
       } else {
         next(
           new PermissionError(
-            'Невозможно удалить карточку другого пользователя'
-          )
+            'Невозможно удалить карточку другого пользователя',
+          ),
         );
       }
     })
@@ -41,7 +42,7 @@ module.exports.likeCard = (req, res, next) => {
     .findByIdAndUpdate(
       req.params.cardId,
       { $addToSet: { likes: req.user._id } },
-      { new: true }
+      { new: true },
     )
     .orFail(() => next(new NotFoundError('Карточка с таким id не найдена')))
     .then((targetCard) => res.send({ data: targetCard }))
@@ -53,7 +54,7 @@ module.exports.dislikeCard = (req, res, next) => {
     .findByIdAndUpdate(
       req.params.cardId,
       { $pull: { likes: req.user._id } },
-      { new: true }
+      { new: true },
     )
     .orFail(() => next(new NotFoundError('Карточка с таким id не найдена')))
     .then((targetCard) => res.send({ data: targetCard }))

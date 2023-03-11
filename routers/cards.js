@@ -18,14 +18,14 @@ router.post(
       link: Joi.string()
         .required()
         .pattern(
-          /(http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-/]))?/
+          /(http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-/]))?/,
         )
         .messages({
           'string.pattern.base': 'Введите корректный url карточки',
         }),
     }),
   }),
-  createCard
+  createCard,
 );
 router.delete(
   '/:cardId',
@@ -34,7 +34,7 @@ router.delete(
       cardId: Joi.string().required().hex().length(24),
     }),
   }),
-  deleteCard
+  deleteCard,
 );
 router.put(
   '/:cardId/likes',
@@ -43,7 +43,7 @@ router.put(
       cardId: Joi.string().required().hex().length(24),
     }),
   }),
-  likeCard
+  likeCard,
 );
 router.delete(
   '/:cardId/likes',
@@ -52,7 +52,7 @@ router.delete(
       cardId: Joi.string().required().hex().length(24),
     }),
   }),
-  dislikeCard
+  dislikeCard,
 );
 
 module.exports = router;
