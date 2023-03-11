@@ -2,6 +2,13 @@ const bcrypt = require('bcrypt');
 const jsonwebtoken = require('jsonwebtoken');
 const user = require('../models/user');
 const { JWT_SECRET } = require('../config');
+const {
+  BadRequestError,
+  AuthorizedError,
+  PermissionError,
+  NotFoundError,
+  DublicationError,
+} = require('../utils/errors');
 
 const ERROR_CODE_404 = 404;
 const ERROR_CODE_401 = 401;
@@ -59,8 +66,15 @@ module.exports.createUser = (req, res, next) => {
       })
     )
     .catch((err) => {
-      if (!password || !email) {
-        next({ code: ERROR_CODE_401 });
+      if (err.name === 'CastError') {
+        next(
+          new BadRequestError(
+            'Переданы некорректные данные в методы создания пользователя'
+          )
+        );
+      }
+      if (err.code === 11000) {
+        next(new DublicationError('Пользователь с таким email уже существует'));
       } else {
         next(err);
       }
