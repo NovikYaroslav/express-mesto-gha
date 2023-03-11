@@ -121,7 +121,7 @@ module.exports.updateUserAvatar = (req, res, next) => {
           )
         );
       } else {
-        res.status(ERROR_CODE_500).send({ message: 'Произошла ошибка' });
+        next(err);
       }
     });
 };

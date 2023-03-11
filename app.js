@@ -9,6 +9,7 @@ const { login } = require('./controllers/users');
 const { createUser } = require('./controllers/users');
 const auth = require('./middlewares/auth');
 const errorHandler = require('./middlewares/error-handler');
+const { NotFoundError } = require('./utils/errors');
 
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000,
@@ -64,5 +65,8 @@ app.post(
 app.use(auth);
 app.use('/users', require('./routers/users'));
 app.use('/cards', require('./routers/cards'));
+app.use('*', () => {
+  throw new NotFoundError('Запрашиваемая страница не найдена');
+});
 app.use(errors());
 app.use(errorHandler);
