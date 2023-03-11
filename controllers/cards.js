@@ -24,7 +24,7 @@ module.exports.deleteCard = (req, res, next) => {
     .findByIdAndRemove(req.params.cardId)
     .orFail(() => next(new NotFoundError('Карточка с таким id не найдена')))
     .then((targetCard) => {
-      if (targetCard.owner !== req.user._id) {
+      if (req.user._id !== targetCard.owner) {
         next(
           new PermissionError(
             'Невозможно удалить карточку другого пользователя',
