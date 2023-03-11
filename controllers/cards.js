@@ -19,13 +19,33 @@ module.exports.createCard = (req, res, next) => {
     .catch(next);
 };
 
+// module.exports.deleteCard = (req, res, next) => {
+//   card
+//     .findByIdAndRemove(req.params.cardId)
+//     .orFail(() => next(new NotFoundError('Карточка с таким id не найдена')))
+//     .then((targetCard) => {
+//       if (req.user._id === targetCard.owner.toString()) {
+//         res.send({ message: 'Карточка удалена' });
+//       } else {
+//         next(
+//           new PermissionError(
+//             'Невозможно удалить карточку другого пользователя',
+//           ),
+//         );
+//       }
+//     })
+//     .catch(next);
+// };
+
 module.exports.deleteCard = (req, res, next) => {
   card
-    .findByIdAndRemove(req.params.cardId)
+    .findById(req.params.cardId)
     .orFail(() => next(new NotFoundError('Карточка с таким id не найдена')))
-    .then((targetCard) => {
-      if (req.user._id === targetCard.owner.toString()) {
-        res.send({ message: 'Карточка удалена' });
+    .then((cardToDelete) => {
+      if (req.user._id === cardToDelete.owner.toString()) {
+        card.findByIdAndRemove(req.params.cardId).then(() => {
+          res.send({ message: 'Карточка удалена' });
+        });
       } else {
         next(
           new PermissionError(
