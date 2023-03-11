@@ -79,7 +79,7 @@ module.exports.getUser = (req, res, next) => {
   user
     .findById(req.params.userId)
     .then((targetUser) => {
-      if (targetUser === null) {
+      if (!targetUser) {
         next(new NotFoundError('Запрашиваемый пользователь не найден'));
       } else {
         res.send({ data: targetUser });
